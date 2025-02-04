@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="ru"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;Chick Runner Extended&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>* {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: #222; /* Цвет фона страницы */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>canvas {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: block;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: 0 auto;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: #000; /* Поле игры */</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border: 1px solid #444;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;canvas id="gameCanvas" width="800" height="300"&gt;&lt;/canvas&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 1. ОБЪЯВЛЯЕМ ПУТИ К ИЗОБРАЖЕНИЯМ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">const IMAGES = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Фоновые слои (при желании можно оставить только один)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>bgLayer1: 'LINK-TO-BACKGROUND1.svg',<span class="Apple-converted-space">  </span>// например, "https://site.ru/bg_layer1.svg"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>bgLayer2: 'LINK-TO-BACKGROUND2.svg',</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Спрайты цыплёнка: два кадра бега, один прыжок, один "зажаренный"</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chickRun1: 'LINK-TO-CHICK-RUN-1.svg',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chickRun2: 'LINK-TO-CHICK-RUN-2.svg',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chickJump: 'LINK-TO-CHICK-JUMP.svg',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chickDead: 'LINK-TO-CHICK-DEAD.svg',<span class="Apple-converted-space">  </span>// зажаренная курица</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Препятствия (3 вида — можно добавить больше или меньше)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>obstacle1: 'LINK-TO-OBSTACLE-1.svg',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>obstacle2: 'LINK-TO-OBSTACLE-2.svg',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>obstacle3: 'LINK-TO-OBSTACLE-3.svg'</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Функция для загрузки изображения</span></p>
+<p class="p1"><span class="s1">function loadImage(src) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const img = new Image();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>img.src = src;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return img;</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 2. КОНТЕКСТ CANVAS</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">const canvas = document.getElementById('gameCanvas');</span></p>
+<p class="p1"><span class="s1">const ctx = canvas.getContext('2d');</span></p>
+<p class="p1"><span class="s1">const WIDTH = canvas.width;</span></p>
+<p class="p1"><span class="s1">const HEIGHT = canvas.height;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 3. СОСТОЯНИЕ ИГРЫ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">let isGameOver = false;</span></p>
+<p class="p1"><span class="s1">let frameCount = 0;</span></p>
+<p class="p1"><span class="s1">let gameSpeed = 2;</span></p>
+<p class="p1"><span class="s1">const speedIncrement = 0.0008; // скорость нарастает со временем</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 4. ФОН (ПАРАЛЛАКС-СЛОИ)</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">const backgroundLayers = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>image: loadImage(IMAGES.bgLayer1),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>x: 0,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>speedFactor: 0.2</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>image: loadImage(IMAGES.bgLayer2),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>x: 0,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>speedFactor: 0.4</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 5. СПРАЙТЫ ЦЫПЛЁНКА</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">const chickSprites = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>run: [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>loadImage(IMAGES.chickRun1),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>loadImage(IMAGES.chickRun2)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>jump: loadImage(IMAGES.chickJump),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>dead: loadImage(IMAGES.chickDead)</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Параметры цыплёнка (player)</span></p>
+<p class="p1"><span class="s1">const chick = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>x: 50,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>y: HEIGHT - 60,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 40,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 40,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>vy: 0,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>jumpPower: -10,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>onGround: false,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>canDoubleJump: true,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animationFrame: 0, <span class="Apple-converted-space">  </span>// для беговой анимации</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animationSpeed: 0.2,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>state: 'run', <span class="Apple-converted-space">      </span>// 'run', 'jump', 'dead' - текущее состояние</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>get hitbox() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Упрощённая прямоугольная коллизия</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>x: this.x,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>y: this.y,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>width: this.width,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>height: this.height</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>};</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 6. ПРЕПЯТСТВИЯ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">const obstacleImages = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>loadImage(IMAGES.obstacle1),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>loadImage(IMAGES.obstacle2),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>loadImage(IMAGES.obstacle3)</span></p>
+<p class="p1"><span class="s1">];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">const obstacles = [];</span></p>
+<p class="p1"><span class="s1">let obstacleInterval = 90; // каждые 90 кадров создаём препятствие</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 7. ГРАВИТАЦИЯ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">const gravity = 0.4;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 8. ГЛАВНЫЙ ЦИКЛ (gameLoop)</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function gameLoop() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!isGameOver) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>update();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>draw();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>requestAnimationFrame(gameLoop);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Рисуем последний кадр с "зажаренным" цыплёнком</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>draw();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>drawGameOver();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 9. ОБНОВЛЕНИЕ (update)</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function update() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>frameCount++;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Ускоряем игру</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gameSpeed += speedIncrement;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 9.1 Обновляем фон (параллакс)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>backgroundLayers.forEach(layer =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>layer.x -= gameSpeed * layer.speedFactor;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// зацикливаем фон</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (layer.x &lt;= -WIDTH) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>layer.x = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 9.2 Цыплёнок (прыжки, анимация бега)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.vy += gravity;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.y += chick.vy;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Приземление</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (chick.y + chick.height &gt;= HEIGHT - 10) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>chick.y = HEIGHT - chick.height - 10;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>chick.vy = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>chick.onGround = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>chick.canDoubleJump = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (chick.state !== 'dead') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.state = 'run';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Если бежим по земле — переключаем кадры анимации</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (chick.state === 'run') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>chick.animationFrame += chick.animationSpeed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (chick.animationFrame &gt;= chickSprites.run.length) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.animationFrame = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 9.3 Генерация препятствий</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (frameCount % obstacleInterval === 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>createObstacle();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 9.4 Движение и проверка столкновений</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>for (let i = 0; i &lt; obstacles.length; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const obs = obstacles[i];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>obs.x -= gameSpeed;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Убираем препятствие, если ушло за левый край</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (obs.x + obs.width &lt; 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>obstacles.splice(i, 1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>i--;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>continue;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Столкновение</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (checkCollision(chick.hitbox, obs)) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.state = 'dead';<span class="Apple-converted-space">  </span>// превращаем в зажаренного</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>isGameOver = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>break;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 10. ОТРИСОВКА (draw)</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function draw() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.clearRect(0, 0, WIDTH, HEIGHT);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 10.1 Рисуем фоновые слои (двойная отрисовка для «бесконечного» скролла)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>backgroundLayers.forEach(layer =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.drawImage(layer.image, layer.x, 0, WIDTH, HEIGHT);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.drawImage(layer.image, layer.x + WIDTH, 0, WIDTH, HEIGHT);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 10.2 «Земля»</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillStyle = '#444';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillRect(0, HEIGHT - 10, WIDTH, 10);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 10.3 Рисуем цыплёнка</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>drawChick();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 10.4 Рисуем препятствия</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>for (let obs of obstacles) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.drawImage(obs.image, obs.x, obs.y, obs.width, obs.height);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">function drawChick() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Если «мертв», показываем зажаренную курицу</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (chick.state === 'dead') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.drawImage(chickSprites.dead, chick.x, chick.y, chick.width, chick.height);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Если «прыжок», показываем спрайт прыжка</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!chick.onGround &amp;&amp; chick.state === 'jump') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.drawImage(chickSprites.jump, chick.x, chick.y, chick.width, chick.height);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Иначе «бег» — циклическая анимация</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const frameIndex = Math.floor(chick.animationFrame) % chickSprites.run.length;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const runSprite = chickSprites.run[frameIndex];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.drawImage(runSprite, chick.x, chick.y, chick.width, chick.height);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 11. СОЗДАНИЕ ПРЕПЯТСТВИЙ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function createObstacle() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Выбираем случайное изображение</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const img = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const obsWidth = 40 + Math.random() * 20; <span class="Apple-converted-space">  </span>// 40-60 px</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const obsHeight = 30 + Math.random() * 20;<span class="Apple-converted-space">  </span>// 30-50 px</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const obsX = WIDTH;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const obsY = HEIGHT - obsHeight - 10;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>obstacles.push({</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>x: obsX,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>y: obsY,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: obsWidth,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>height: obsHeight,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>image: img</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 12. ПРОВЕРКА СТОЛКНОВЕНИЙ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function checkCollision(r1, obs) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return (</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>r1.x &lt; obs.x + obs.width &amp;&amp;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>r1.x + r1.width &gt; obs.x &amp;&amp;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>r1.y &lt; obs.y + obs.height &amp;&amp;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>r1.y + r1.height &gt; obs.y</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 13. РИСУЕМ GAME OVER</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function drawGameOver() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillStyle = 'rgba(0,0,0,0.7)';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillRect(0, 0, WIDTH, HEIGHT);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillStyle = '#FFF';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.font = '32px monospace';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillText('GAME OVER', WIDTH / 2 - 80, HEIGHT / 2 - 20);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.font = '16px monospace';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ctx.fillText('Нажмите ПРОБЕЛ, чтобы перезапустить', WIDTH / 2 - 150, HEIGHT / 2 + 10);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 14. ОБРАБОТКА СОБЫТИЙ КЛАВИАТУРЫ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">document.addEventListener('keydown', function(e) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (e.code === 'Space') {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Если игра уже окончена — перезапуск</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (isGameOver) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>restartGame();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Иначе — прыгаем</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (chick.onGround) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.vy = chick.jumpPower;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.onGround = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.state = 'jump';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>} else if (chick.canDoubleJump) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.vy = chick.jumpPower;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.canDoubleJump = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>chick.state = 'jump';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p1"><span class="s1">});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 15. ПЕРЕЗАПУСК ИГРЫ</span></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">function restartGame() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>isGameOver = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>frameCount = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gameSpeed = 2;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.x = 50;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.y = HEIGHT - 60;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.vy = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.onGround = false;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.canDoubleJump = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.state = 'run';</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>chick.animationFrame = 0;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>obstacles.length = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>requestAnimationFrame(gameLoop);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// ==============================</span></p>
+<p class="p1"><span class="s1">// 16. СТАРТУЕМ!</span></p>
+<p class="p1"><span class="s1">requestAnimationFrame(gameLoop);</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
